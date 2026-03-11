@@ -1,10 +1,10 @@
 import { client } from "../lib/client";
 
 export interface Product {
-  id: number;
-  name: string;
-  part_number: string;
-  slug: string;
+  id: number
+  name: string
+  part_number: string
+  slug: string
 }
 
 export interface CreateProductPayload {
@@ -26,6 +26,13 @@ export function getProducts(search?: string): Promise<Product[]> {
     .then(res => res.data);
 }
 
+export function updateProduct(id: number, data: any) {
+  return client.put(`/admin/products/${id}`, data)
+}
+
+export function deleteProduct(id: number) {
+  return client.delete(`/admin/products/${id}`)
+}
 /* GET SINGLE PRODUCT */
 
 export function getProduct(slug: string): Promise<Product> {
@@ -36,18 +43,63 @@ export function getProduct(slug: string): Promise<Product> {
 
 /* CREATE */
 
-export function createProduct(data: CreateProductPayload) {
-  return client.post("/catalog/products", data);
+export function createProduct(data: {
+    name: string
+    part_number: string
+    brand_id: number
+  }) {
+    return client.post("/admin/products", data)
 }
 
-/* UPDATE */
+/* UPLOAD PRODUCT IMAGE */
 
-export function updateProduct(slug: string, data: any) {
-  return client.put(`/catalog/products/${slug}`, data);
+export async function uploadProductImage(productId: number, file: File) {
+  const form = new FormData()
+  form.append("image", file)
+
+  const res = await fetch(
+    `http://127.0.0.1:8000/api/admin/products/${productId}/images`,
+    {
+      method: "POST",
+      body: form
+    }
+  )
+
+  if (!res.ok) {
+    const text = await res.text()
+    console.error(text)
+    throw new Error("Upload failed")
+  }
+
+  return res.json()
 }
 
-/* DELETE */
+/* ATTACH ATTRIBUTES */
 
-export function deleteProduct(id: number) {
-  return client.delete(`/catalog/products/${id}`);
+export function attachAttributes(productId: number, attributes: any[]) {
+
+  return client.post(`/admin/products/${productId}/attributes`, {
+    attributes
+  });
+
+}
+
+/* ADD ALIASES */
+
+export function addAliases(productId: number, aliases: string[]) {
+
+  return client.post(`/admin/products/${productId}/aliases`, {
+    aliases
+  });
+
+}
+
+/* ADD CROSS REFERENCES */
+
+export function addCrossReferences(productId: number, references: any[]) {
+
+  return client.post(`/admin/products/${productId}/cross-references`, {
+    references
+  });
+
 }

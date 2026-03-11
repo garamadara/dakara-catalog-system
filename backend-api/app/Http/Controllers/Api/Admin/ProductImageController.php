@@ -16,7 +16,7 @@ class ProductImageController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|max:4096'
+            'image' => 'nullable|image|max:4096'
         ]);
 
         $path = $request->file('image')->store('products', 'public');
@@ -30,18 +30,21 @@ class ProductImageController extends Controller
     /**
      * Attach image to product
      */
-    public function store(Request $request, $productId)
+    public function store(Request $request, Product $product)
     {
         $request->validate([
-            'path' => 'required|string'
+            'image' => 'nullable|image|max:4096'
         ]);
 
-        $product = Product::findOrFail($productId);
+        if (!$request->hasFile('image')) {
+            return response()->json(['message' => 'No image uploaded']);
+        }
 
-        $image = ProductImage::create([
-            'product_id' => $product->id,
-            'image_path' => $request->path,
-            'sort_order' => $request->sort_order ?? 1
+        $path = $request->file('image')->store('products', 'public');
+
+        $image = $product->images()->create([
+            'image_url' => $path,
+            'sort_order' => 0
         ]);
 
         return response()->json($image);
@@ -54,7 +57,7 @@ class ProductImageController extends Controller
     {
         $image = ProductImage::findOrFail($id);
 
-        Storage::disk('public')->delete($image->image_path);
+        Storage::disk('public')->delete($image->image_url);
 
         $image->delete();
 

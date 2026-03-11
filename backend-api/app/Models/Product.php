@@ -40,10 +40,11 @@ class Product extends Model
         });
     }
 
-    public static function normalizePartNumber($value)
+    public static function normalizePartNumber(string $partNumber): string
     {
-        return strtoupper(preg_replace('/[^A-Z0-9]/', '', $value));
+        return strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $partNumber));
     }
+
     public function aliases()
     {
         return $this->hasMany(ProductAlias::class);
@@ -84,5 +85,10 @@ class Product extends Model
     public function crossReferences()
     {
         return $this->hasMany(ProductCrossReference::class);
+    }
+    
+    public static function generateSlug(string $name, string $partNumber): string
+    {
+        return Str::slug($name . '-' . $partNumber);
     }
 }

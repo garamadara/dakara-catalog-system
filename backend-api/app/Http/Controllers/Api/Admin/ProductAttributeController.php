@@ -4,29 +4,49 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductAttribute;
+use Illuminate\Http\Request;
 
 class ProductAttributeController extends Controller
 {
-    public function store($productId)
+    public function store(Request $request, $productId)
     {
-        $attributes = request()->input('attributes', []);
+        $data = $request->validate([
+            'attributes' => 'required|array',
+            'attributes.*.attribute_id' => 'required|integer',
+            'attributes.*.value' => 'required'
+        ]);
 
-        foreach ($attributes as $attr) {
+        foreach ($data['attributes'] as $attr) {
 
-            ProductAttribute::updateOrCreate(
-                [
+            $value = $attr['value'];
+
+            // handle multi-value attributes
+            if (is_array($value)) {
+
+                foreach ($value as $v) {
+
+                    ProductAttribute::create([
+                        'product_id' => $productId,
+                        'attribute_id' => $attr['attribute_id'],
+                        'value' => $v
+                    ]);
+
+                }
+
+            } else {
+
+                ProductAttribute::create([
                     'product_id' => $productId,
-                    'attribute_id' => $attr['attribute_id']
-                ],
-                [
-                    'value' => $attr['value']
-                ]
-            );
+                    'attribute_id' => $attr['attribute_id'],
+                    'value' => $value
+                ]);
+
+            }
 
         }
 
         return response()->json([
-            'message' => 'Attributes saved'
+            'success' => true
         ]);
     }
 

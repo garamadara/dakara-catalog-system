@@ -1,44 +1,38 @@
-const API_URL = "http://127.0.0.1:8000/api";
+const API_BASE = "http://127.0.0.1:8000/api"
 
-async function request<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
-
-  const response = await fetch(`${API_URL}${endpoint}`, {
+export async function request(path: string, options: RequestInit = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
     headers: {
       "Content-Type": "application/json",
+      "Accept": "application/json",
+      ...(options.headers || {})
     },
-    ...options,
-  });
+    ...options
+  })
 
-  if (!response.ok) {
-    throw new Error("API request failed");
+  if (!res.ok) {
+    const text = await res.text()
+    console.error("API ERROR:", text)
+    throw new Error("API request failed")
   }
 
-  return response.json();
+  return res.json()
 }
 
 export const client = {
-
-  get: <T>(endpoint: string) =>
-    request<T>(endpoint),
-
-  post: <T>(endpoint: string, body: unknown) =>
-    request<T>(endpoint, {
+  get: (path: string) => request(path),
+  post: (path: string, body: any) =>
+    request(path, {
       method: "POST",
       body: JSON.stringify(body),
     }),
-
-    put: <T>(endpoint: string, body: unknown) =>
-    request<T>(endpoint, {
+  put: (path: string, body: any) =>
+    request(path, {
       method: "PUT",
       body: JSON.stringify(body),
     }),
-
-  delete: <T>(endpoint: string) =>
-    request<T>(endpoint, {
+  delete: (path: string) =>
+    request(path, {
       method: "DELETE",
     }),
-};
-
+}

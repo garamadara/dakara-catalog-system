@@ -1,5 +1,6 @@
-import api from "../lib/api"
+import api from "../lib/api";
 
-export function getBrands() {
-  return api.get("/admin/brands").then(res => res.data)
+export async function getBrands() {
+  const res = await api.get("/admin/brands");
+  return res.data;
 }

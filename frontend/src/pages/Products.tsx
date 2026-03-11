@@ -93,12 +93,8 @@ export default function Products() {
   if (isLoading) return <div className="p-6">Loading...</div>;
   if (error) return <div className="p-6">API Error</div>;
 
-  return (
+    return (
     <div className="p-6">
-
-      {/* ------------------------------
-          Header
-      ------------------------------ */}
 
       <PageHeader
         title="Products"
@@ -108,15 +104,12 @@ export default function Products() {
         onAction={() => navigate("/products/create")}
       />
 
-      {/* ------------------------------
-          Table
-      ------------------------------ */}
-
       <AdminTable
-          columns={columns}
-          data={data}
-          isLoading={isLoading}
-        />
+        columns={columns}
+        data={data ?? []}
+        isLoading={isLoading}
+      />
+
     </div>
   );
 }

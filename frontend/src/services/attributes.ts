@@ -4,6 +4,6 @@ export async function getAttributes() {
 
   const res = await api.get("/admin/attributes")
 
-  return res.data.data
+  return res.data
 
 }
