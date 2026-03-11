@@ -22,7 +22,6 @@ import {
   addCrossReferences
 } from "../services/products";
 
-
 type ProductForm = {
   name: string
   part_number: string
@@ -55,7 +54,6 @@ type ProductForm = {
   brands?: any[]
 }
 
-
 export default function CreateProduct() {
 
   const [form,setForm] = useState<ProductForm>({
@@ -86,18 +84,17 @@ export default function CreateProduct() {
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories
-  })
+  });
 
   const { data: brands } = useQuery({
     queryKey: ["brands"],
     queryFn: getBrands
-  })
+  });
 
   const { data: attributes } = useQuery({
     queryKey: ["attributes"],
     queryFn: getAttributes
-  })
-
+  });
 
   useEffect(() => {
 
@@ -105,10 +102,10 @@ export default function CreateProduct() {
       setForm(prev => ({
         ...prev,
         categories
-      }))
+      }));
     }
 
-  }, [categories])
+  }, [categories]);
 
   useEffect(() => {
 
@@ -116,11 +113,10 @@ export default function CreateProduct() {
       setForm(prev => ({
         ...prev,
         brands
-      }))
+      }));
     }
 
-  }, [brands])
-
+  }, [brands]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 
@@ -151,20 +147,15 @@ export default function CreateProduct() {
         status: form.status
       });
 
+      const productId = product.id ?? product.data?.id;
 
-      const productId = product.id;
-
-
-      // upload images
+      console.log("Images to upload:", form.images);
 
       for (const img of form.images) {
         if (img?.file) {
           await uploadProductImage(productId, img.file);
         }
       }
-
-
-      // attach attributes
 
       const attrs = Object.entries(form.attribute_values).map(
         ([attribute_id, value]) => ({
@@ -177,15 +168,9 @@ export default function CreateProduct() {
         await attachAttributes(productId, attrs);
       }
 
-
-      // aliases
-
       if (form.aliases?.length) {
         await addAliases(productId, form.aliases);
       }
-
-
-      // cross references
 
       if (form.cross_refs?.length) {
         await addCrossReferences(productId, form.cross_refs);
@@ -200,13 +185,12 @@ export default function CreateProduct() {
 
   }
 
-
   return (
-    <form onSubmit={handleSubmit} className="p-8">
+    <form onSubmit={handleSubmit} className="p-10 bg-gray-50 min-h-screen">
 
-      <div className="grid grid-cols-12 gap-8">
+      <div className="grid grid-cols-12 gap-10 max-w-7xl mx-auto">
 
-        <div className="col-span-9 space-y-8">
+        <div className="col-span-9 space-y-10">
 
           <BasicInfoSection form={form} setForm={setForm} />
 

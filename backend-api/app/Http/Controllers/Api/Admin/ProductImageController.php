@@ -10,35 +10,11 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductImageController extends Controller
 {
-    /**
-     * Upload image to storage
-     */
-    public function upload(Request $request)
-    {
-        $request->validate([
-            'image' => 'nullable|image|max:4096'
-        ]);
-
-        $path = $request->file('image')->store('products', 'public');
-
-        return response()->json([
-            'url' => asset('storage/' . $path),
-            'path' => $path
-        ]);
-    }
-
-    /**
-     * Attach image to product
-     */
     public function store(Request $request, Product $product)
     {
         $request->validate([
-            'image' => 'nullable|image|max:4096'
+            'image' => 'required|image|max:4096'
         ]);
-
-        if (!$request->hasFile('image')) {
-            return response()->json(['message' => 'No image uploaded']);
-        }
 
         $path = $request->file('image')->store('products', 'public');
 
@@ -50,9 +26,6 @@ class ProductImageController extends Controller
         return response()->json($image);
     }
 
-    /**
-     * Delete product image
-     */
     public function destroy($id)
     {
         $image = ProductImage::findOrFail($id);
@@ -75,7 +48,7 @@ class ProductImageController extends Controller
         ]);
 
         foreach ($data['images'] as $img) {
-            \App\Models\ProductImage::where('id', $img['id'])
+            ProductImage::where('id', $img['id'])
                 ->where('product_id', $product->id)
                 ->update(['sort_order' => $img['sort_order']]);
         }

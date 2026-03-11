@@ -1,0 +1,23 @@
+.pb-editor .ql-toolbar {
+  border: 1px solid #e5e7eb;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: #fafafa;
+}
+
+.pb-editor .ql-container {
+  border: 1px solid #e5e7eb;
+  border-radius: 0 0 8px 8px;
+  min-height: 160px;
+  font-size: 14px;
+}
+
+.pb-editor .ql-editor {
+  padding: 12px 14px;
+  line-height: 1.6;
+}
+
+.pb-editor:focus-within .ql-container {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 1px #22c55e;
+}

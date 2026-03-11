@@ -1,111 +1,188 @@
-import { useState } from "react";
+import { useState } from "react"
 
 export default function CrossReferenceSection({ form, setForm }: any) {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
 
-  const refs = form.cross_refs || [];
+  const [partNumber, setPartNumber] = useState("")
+  const [productId, setProductId] = useState("")
 
-  async function search(value: string) {
-    setQuery(value);
+  function addReference() {
 
-    if (!value) {
-      setResults([]);
-      return;
-    }
+    if (!partNumber) return
 
-    const res = await fetch(`/api/catalog/search/suggest?q=${value}`);
-    const data = await res.json();
-
-    setResults(data);
-  }
-
-  function addRef(product: any) {
-
-    // prevent duplicates
-    if (refs.find((r: any) => r.referenced_product_id === product.id)) {
-      return;
+    const newRef = {
+      referenced_product_id: Number(productId) || null,
+      part_number: partNumber
     }
 
     setForm({
       ...form,
-      cross_refs: [
-        ...refs,
-        {
-          referenced_product_id: product.id,
-          part_number: product.part_number,
-        },
-      ],
-    });
+      cross_refs: [...form.cross_refs, newRef]
+    })
 
-    setQuery("");
-    setResults([]);
+    setPartNumber("")
+    setProductId("")
   }
 
-  function removeRef(index: number) {
-    const newRefs = [...refs];
-    newRefs.splice(index, 1);
+  function removeReference(index: number) {
+
+    const updated = [...form.cross_refs]
+    updated.splice(index, 1)
 
     setForm({
       ...form,
-      cross_refs: newRefs,
-    });
+      cross_refs: updated
+    })
+
   }
 
   return (
+
     <section className="grid grid-cols-12 gap-6">
 
+      {/* LEFT PANEL */}
+
       <div className="col-span-3">
-        <h3 className="text-sm font-semibold">Cross References</h3>
+
+        <h3 className="text-sm font-semibold text-gray-900">
+          Cross References
+        </h3>
+
+        <p className="text-xs text-gray-500 mt-1">
+          Add compatible or equivalent parts.
+        </p>
+
       </div>
 
-      <div className="col-span-9 bg-white border rounded-lg p-6">
+      {/* RIGHT CARD */}
 
-        {/* Search input */}
-        <input
-          className="input w-full mb-3"
-          placeholder="Search part number..."
-          value={query}
-          onChange={(e) => search(e.target.value)}
-        />
+      <div className="col-span-9 bg-white border border-gray-200 rounded-xl p-6 space-y-4">
 
-        {/* dropdown */}
-        {results.length > 0 && (
-          <div className="border rounded mb-4 bg-white">
-            {results.map((p: any) => (
-              <div
-                key={p.id}
-                className="p-2 hover:bg-gray-100 cursor-pointer"
-                onClick={() => addRef(p)}
-              >
-                <div className="font-medium">{p.part_number}</div>
-                <div className="text-xs text-gray-500">{p.name}</div>
-              </div>
-            ))}
+        {/* ADD FORM */}
+
+        <div className="grid grid-cols-12 gap-3">
+
+          {/* PART NUMBER */}
+
+          <div className="col-span-5">
+
+            <input
+              type="text"
+              placeholder="Part number"
+              value={partNumber}
+              onChange={(e) => setPartNumber(e.target.value)}
+              className="
+              w-full
+              border
+              border-gray-200
+              rounded-md
+              px-3
+              py-2
+              text-sm
+              focus:outline-none
+              focus:ring-2
+              focus:ring-green-500
+              "
+            />
+
           </div>
-        )}
 
-        {/* selected references */}
-        <div className="flex flex-wrap gap-2">
-          {refs.map((r: any, i: number) => (
-            <span
-              key={i}
-              className="px-3 py-1 bg-gray-200 text-xs rounded flex items-center gap-2"
+          {/* PRODUCT ID */}
+
+          <div className="col-span-5">
+
+            <input
+              type="text"
+              placeholder="Product ID (optional)"
+              value={productId}
+              onChange={(e) => setProductId(e.target.value)}
+              className="
+              w-full
+              border
+              border-gray-200
+              rounded-md
+              px-3
+              py-2
+              text-sm
+              focus:outline-none
+              focus:ring-2
+              focus:ring-green-500
+              "
+            />
+
+          </div>
+
+          {/* ADD BUTTON */}
+
+          <div className="col-span-2">
+
+            <button
+              type="button"
+              onClick={addReference}
+              className="
+              w-full
+              bg-green-600
+              hover:bg-green-700
+              text-white
+              text-sm
+              font-medium
+              px-4
+              py-2
+              rounded-md
+              transition
+              "
             >
-              {r.part_number}
+              Add
+            </button>
 
-              <button
-                type="button"
-                className="text-red-500"
-                onClick={() => removeRef(i)}
-              >
-                ✕
-              </button>
-            </span>
-          ))}
+          </div>
+
         </div>
 
+        {/* LIST */}
+
+        {form.cross_refs?.length > 0 && (
+
+          <div className="border border-gray-200 rounded-md divide-y">
+
+            {form.cross_refs.map((ref: any, index: number) => (
+
+              <div
+                key={index}
+                className="flex justify-between items-center px-4 py-2 text-sm"
+              >
+
+                <div className="text-gray-700">
+
+                  {ref.part_number}
+
+                  {ref.referenced_product_id && (
+                    <span className="text-gray-400 ml-2">
+                      (Product #{ref.referenced_product_id})
+                    </span>
+                  )}
+
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => removeReference(index)}
+                  className="text-red-500 hover:text-red-600 text-xs"
+                >
+                  Remove
+                </button>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        )}
+
       </div>
+
     </section>
-  );
+
+  )
+
 }

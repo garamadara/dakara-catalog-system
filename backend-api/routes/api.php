@@ -72,7 +72,7 @@ Route::prefix('admin')->group(function () {
     | Products
     |--------------------------------------------------------------------------
     */
-
+    Route::get('/products', [AdminProductController::class, 'index']);
     Route::post('/products', [AdminProductController::class, 'store']);
     Route::get('/products/{product}/edit', [AdminProductController::class, 'edit']);
     Route::put('/products/{product}', [AdminProductController::class, 'update']);

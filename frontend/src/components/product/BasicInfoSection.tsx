@@ -8,38 +8,39 @@ export default function BasicInfoSection({ form, setForm }: any) {
     <section className="grid grid-cols-12 gap-6">
 
       <div className="col-span-3">
-        <h3 className="text-sm font-semibold">Basic Info</h3>
+        <h3 className="text-sm font-semibold text-gray-900">
+          Basic Info
+        </h3>
 
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 mt-1">
           Enter product basic information.
         </p>
       </div>
 
-      <div className="col-span-9 bg-white border rounded-lg p-6">
+      <div className="col-span-9 bg-white border rounded-xl p-6">
 
         <div className="grid grid-cols-12 gap-4">
 
-          {/* Row 1 — Product Name */}
-
           <div className="col-span-12">
-            <label className="label">Product Name *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Product Name *
+            </label>
 
             <input
-              className="input"
+              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 outline-none"
               placeholder="Example: STIHL MS-252 Chain Saw 16 inch"
               value={form.name || ""}
               onChange={(e) => update("name", e.target.value)}
             />
           </div>
 
-
-          {/* Row 2 */}
-
           <div className="col-span-5">
-            <label className="label">Category *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Category *
+            </label>
 
             <select
-              className="input"
+              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
               value={form.category_id ?? ""}
               onChange={(e) =>
                 update("category_id", e.target.value ? Number(e.target.value) : null)
@@ -55,12 +56,13 @@ export default function BasicInfoSection({ form, setForm }: any) {
             </select>
           </div>
 
-
           <div className="col-span-4">
-            <label className="label">Brand</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Brand
+            </label>
 
-           <select
-              className="input"
+            <select
+              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
               value={form.brand_id ?? ""}
               onChange={(e) =>
                 update("brand_id", e.target.value ? Number(e.target.value) : null)
@@ -76,12 +78,13 @@ export default function BasicInfoSection({ form, setForm }: any) {
             </select>
           </div>
 
-
           <div className="col-span-3">
-            <label className="label">Part Number</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Part Number
+            </label>
 
             <input
-              className="input"
+              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
               placeholder="Optional"
               value={form.part_number || ""}
               onChange={(e) => update("part_number", e.target.value)}

@@ -9,6 +9,49 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
+    public function index(Request $request)
+    {
+        $query = Product::with([
+            'brand',
+            'categories',
+            'thumbnail'
+        ])->latest();
+
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                  ->orWhere('part_number', 'like', "%{$request->search}%");
+            });
+        }
+
+        $products = $query->paginate(20);
+
+        $products->getCollection()->transform(function ($p) {
+
+            return [
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug,
+                'part_number' => $p->part_number,
+
+                'brand' => $p->brand,
+
+                'categories' => $p->categories,
+
+                'selling_price' => $p->selling_price,
+
+                'status' => $p->status ?? 'draft',
+
+                'thumbnail' => $p->thumbnail
+                    ? [
+                        'image_url' => $p->thumbnail->image_url
+                    ]
+                    : null
+            ];
+        });
+
+        return response()->json($products);
+    }
 
     public function store(Request $request)
     {
@@ -61,7 +104,7 @@ class ProductController extends Controller
         $product->load([
             'brand',
             'categories',
-            'images',
+            'imageimages',
             'aliases',
             'crossReferences',
             'attributes.attribute'

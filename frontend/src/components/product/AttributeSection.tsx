@@ -10,7 +10,6 @@ export default function AttributeSection({ form, setForm }: any) {
   });
 
   const values = form.attribute_values || {};
-
   const [selectedAttr, setSelectedAttr] = useState("");
 
   function update(id: number, value: any) {
@@ -65,43 +64,75 @@ export default function AttributeSection({ form, setForm }: any) {
     attributes?.filter((a: any) => !selectedIds.includes(a.id)) || [];
 
   return (
+
     <section className="grid grid-cols-12 gap-6">
 
+      {/* LEFT TITLE */}
+
       <div className="col-span-3">
-        <h3 className="text-sm font-semibold">
+
+        <h3 className="text-sm font-semibold text-gray-900">
           Attributes
         </h3>
 
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 mt-1">
           Add product specifications.
         </p>
+
       </div>
 
-      <div className="col-span-9 bg-white border rounded-lg p-6 space-y-4">
+      {/* RIGHT CARD */}
 
-        {/* ADD ATTRIBUTE */}
+      <div className="col-span-9 bg-white border border-gray-200 rounded-xl p-6 space-y-6">
+
+        {/* ATTRIBUTE SELECT */}
 
         <div className="flex gap-3">
 
           <select
-            className="input"
+            className="
+            flex-1
+            border
+            border-gray-200
+            rounded-md
+            px-3
+            py-2
+            text-sm
+            text-gray-800
+            focus:outline-none
+            focus:ring-2
+            focus:ring-green-500
+            "
             value={selectedAttr}
             onChange={(e) => setSelectedAttr(e.target.value)}
           >
+
             <option value="">Select attribute</option>
 
             {availableAttributes.map((attr: any) => (
+
               <option key={attr.id} value={attr.id}>
                 {attr.name}
               </option>
+
             ))}
 
           </select>
 
           <button
             type="button"
-            className="px-3 py-2 bg-gray-200 rounded"
             onClick={addAttribute}
+            className="
+            bg-green-600
+            hover:bg-green-700
+            text-white
+            text-sm
+            font-medium
+            px-4
+            py-2
+            rounded-md
+            transition
+            "
           >
             Add
           </button>
@@ -110,7 +141,7 @@ export default function AttributeSection({ form, setForm }: any) {
 
         {/* SELECTED ATTRIBUTES */}
 
-        <div className="space-y-4">
+        <div className="space-y-6">
 
           {selectedIds.map((id) => {
 
@@ -120,117 +151,161 @@ export default function AttributeSection({ form, setForm }: any) {
 
               <div
                 key={id}
-                className="grid grid-cols-3 gap-4 items-start"
+                className="grid grid-cols-12 gap-6 items-start"
               >
 
-                <label className="text-sm font-medium">
+                {/* LABEL */}
+
+                <label className="col-span-3 text-sm font-medium text-gray-700 pt-2">
                   {attr?.name}
                 </label>
 
-                {(() => {
+                {/* FIELD */}
 
-                  if (!attr) return null;
+                <div className="col-span-7">
 
-                  // SELECT (multi-value)
-                  if (attr.type === "select") {
+                  {(() => {
 
-                    const selectedValues = values[id] || [];
+                    if (!attr) return null;
 
-                    return (
+                    /* SELECT (multi checkbox) */
 
-                      <div className="col-span-1 space-y-1">
+                    if (attr.type === "select") {
 
-                        {attr.options?.map((opt: string) => {
+                      const selectedValues = values[id] || [];
 
-                          const checked = selectedValues.includes(opt);
+                      return (
 
-                          return (
+                        <div className="space-y-2">
 
-                            <label
-                              key={opt}
-                              className="flex items-center gap-2 text-sm"
-                            >
+                          {attr.options?.map((opt: string) => {
 
-                              <input
-                                type="checkbox"
-                                checked={checked}
-                                onChange={(e) => {
+                            const checked = selectedValues.includes(opt);
 
-                                  let updated = [...selectedValues];
+                            return (
 
-                                  if (e.target.checked) {
-                                    updated.push(opt);
-                                  } else {
-                                    updated = updated.filter(v => v !== opt);
-                                  }
+                              <label
+                                key={opt}
+                                className="flex items-center gap-2 text-sm text-gray-700"
+                              >
 
-                                  update(id, updated);
+                                <input
+                                  type="checkbox"
+                                  className="accent-green-600"
+                                  checked={checked}
+                                  onChange={(e) => {
 
-                                }}
-                              />
+                                    let updated = [...selectedValues];
 
-                              {opt}
+                                    if (e.target.checked) {
+                                      updated.push(opt);
+                                    } else {
+                                      updated = updated.filter(v => v !== opt);
+                                    }
 
-                            </label>
+                                    update(id, updated);
 
-                          );
+                                  }}
+                                />
 
-                        })}
+                                {opt}
 
-                      </div>
+                              </label>
 
-                    );
+                            );
 
-                  }
+                          })}
 
-                  // BOOLEAN
-                  if (attr.type === "boolean") {
+                        </div>
+
+                      );
+
+                    }
+
+                    /* BOOLEAN */
+
+                    if (attr.type === "boolean") {
+
+                      return (
+                        <input
+                          type="checkbox"
+                          className="accent-green-600"
+                          checked={values[id] === "true"}
+                          onChange={(e) =>
+                            update(id, e.target.checked ? "true" : "false")
+                          }
+                        />
+                      );
+
+                    }
+
+                    /* NUMBER */
+
+                    if (attr.type === "number") {
+
+                      return (
+                        <input
+                          type="number"
+                          className="
+                          w-full
+                          border
+                          border-gray-200
+                          rounded-md
+                          px-3
+                          py-2
+                          text-sm
+                          text-gray-800
+                          focus:outline-none
+                          focus:ring-2
+                          focus:ring-green-500
+                          "
+                          value={values[id] || ""}
+                          onChange={(e) => update(id, e.target.value)}
+                        />
+                      );
+
+                    }
+
+                    /* TEXT */
 
                     return (
                       <input
-                        type="checkbox"
-                        checked={values[id] === "true"}
-                        onChange={(e) =>
-                          update(id, e.target.checked ? "true" : "false")
-                        }
-                      />
-                    );
-
-                  }
-
-                  // NUMBER
-                  if (attr.type === "number") {
-
-                    return (
-                      <input
-                        type="number"
-                        className="input col-span-1"
+                        className="
+                        w-full
+                        border
+                        border-gray-200
+                        rounded-md
+                        px-3
+                        py-2
+                        text-sm
+                        text-gray-800
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-green-500
+                        "
+                        placeholder={`Enter ${attr.name}`}
                         value={values[id] || ""}
                         onChange={(e) => update(id, e.target.value)}
                       />
                     );
 
-                  }
+                  })()}
 
-                  // TEXT
-                  return (
-                    <input
-                      className="input col-span-1"
-                      placeholder={`Enter ${attr.name}`}
-                      value={values[id] || ""}
-                      onChange={(e) => update(id, e.target.value)}
-                    />
-                  );
+                </div>
 
-                })()}
+                {/* REMOVE BUTTON */}
 
-                <button
-                  type="button"
-                  className="text-red-500 text-sm"
-                  onClick={() => removeAttribute(id)}
-                >
-                  Remove
-                </button>
+                <div className="col-span-2 pt-2">
+
+                  <button
+                    type="button"
+                    className="text-red-500 text-sm hover:underline"
+                    onClick={() => removeAttribute(id)}
+                  >
+                    Remove
+                  </button>
+
+                </div>
 
               </div>
 
@@ -243,5 +318,7 @@ export default function AttributeSection({ form, setForm }: any) {
       </div>
 
     </section>
+
   );
+
 }

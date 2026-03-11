@@ -8,19 +8,17 @@ class ProductImage extends Model
 {
     protected $fillable = [
         'product_id',
-        'image_path',
+        'image_url',
         'sort_order'
     ];
-
-    protected $appends = ['image_url'];
 
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
-    public function getImageUrlAttribute()
+    public function getImageUrlAttribute($value)
     {
-        return asset('storage/' . $this->image_path);
+        return asset('storage/' . $value);
     }
 }

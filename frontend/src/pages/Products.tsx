@@ -15,43 +15,96 @@ export default function Products() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const columns = [
-  {
-    header: "ID",
-    accessor: (p: Product) => p.id,
-  },
-  {
-    header: "Name",
-    accessor: (p: Product) => p.name,
-  },
-  {
-    header: "Part Number",
-    accessor: (p: Product) => p.part_number,
-  },
-  {
-    header: "Actions",
-    accessor: (p: Product) => (
-      <div className="space-x-3">
-        <button
-          onClick={() => navigate(`/products/${p.slug}/edit`)}
-          className="text-blue-600 hover:underline"
-        >
-          Edit
-        </button>
+    {
+      header: "ID",
+      accessor: (p: Product) => (
+        <span className="text-sm text-gray-500">
+          {p.id}
+        </span>
+      ),
+    },
 
-        <button
-          onClick={() => handleDelete(p.id)}
-          className="text-red-600 hover:underline"
-        >
-          Delete
-        </button>
-      </div>
-    ),
-  },
-];
+    {
+      header: "Thumbnail",
+      accessor: (p: Product) => (
+        <img
+          src={
+            p.thumbnail?.image_url
+              ? p.thumbnail.image_url
+              : "/placeholder.png"
+          }
+          className="w-12 h-12 object-cover rounded"
+        />
+      ),
+    },
 
-  /* ------------------------------
-     Debounce search (300ms)
-  ------------------------------ */
+    {
+      header: "Item Name",
+      accessor: (p: Product) => (
+        <span className="text-sm font-medium text-gray-800">
+          {p.name}
+        </span>
+      ),
+    },
+
+    {
+      header: "Category",
+      accessor: (p: Product) => (
+        <span className="text-sm text-gray-500">
+          {p.categories?.length ? p.categories[0].name : "-"}
+        </span>
+      ),
+    },
+
+    {
+      header: "Price",
+      accessor: (p: Product) => (
+        <span className="text-sm font-medium text-gray-700">
+          $${Number(p.selling_price || 0).toFixed(2)}
+        </span>
+      ),
+    },
+
+    {
+      header: "Status",
+      accessor: (p: Product) => (
+        <span
+          className={`px-3 py-1 text-xs font-semibold rounded-full ${
+            p.status === "published"
+              ? "bg-green-100 text-green-700"
+              : "bg-yellow-100 text-yellow-700"
+          }`}
+        >
+          {p.status ?? "draft"}
+        </span>
+      ),
+    },
+
+    {
+      header: "Action",
+      accessor: (p: Product) => (
+        <div className="flex gap-4 text-sm">
+
+          <button
+            onClick={() => navigate(`/products/${p.slug}/edit`)}
+            className="text-blue-600 hover:text-blue-800 font-medium"
+          >
+            Edit
+          </button>
+
+          <button
+            onClick={() => handleDelete(p.id)}
+            className="text-red-500 hover:text-red-700 font-medium"
+          >
+            Delete
+          </button>
+
+        </div>
+      ),
+    },
+  ];
+
+  /* Debounce search */
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -61,18 +114,14 @@ export default function Products() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  /* ------------------------------
-     Fetch products
-  ------------------------------ */
+  /* Fetch products */
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["products", debouncedSearch],
     queryFn: () => getProducts(debouncedSearch),
   });
 
-  /* ------------------------------
-     Delete mutation
-  ------------------------------ */
+  /* Delete mutation */
 
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
@@ -86,14 +135,13 @@ export default function Products() {
 
   function handleDelete(id: number) {
     if (!confirm("Delete this product?")) return;
-
     deleteMutation.mutate(id);
   }
 
   if (isLoading) return <div className="p-6">Loading...</div>;
   if (error) return <div className="p-6">API Error</div>;
 
-    return (
+  return (
     <div className="p-6">
 
       <PageHeader

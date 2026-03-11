@@ -3,14 +3,23 @@ import { client } from "../lib/client";
 export interface Product {
   id: number
   name: string
-  part_number: string
-  slug: string
+  selling_price: number
+  status: "draft" | "published"
+
+  thumbnail?: {
+    image_url: string
+  }
+
+  categories?: {
+    id: number
+    name: string
+  }[]
 }
 
 export interface CreateProductPayload {
-  name: string;
-  part_number?: string;
-  brand_id?: number | null;
+  name: string
+  part_number?: string
+  brand_id?: number | null
 }
 
 /* GET PRODUCTS */
@@ -18,44 +27,54 @@ export interface CreateProductPayload {
 export function getProducts(search?: string): Promise<Product[]> {
 
   const url = search
-    ? `/catalog/products?search=${encodeURIComponent(search)}`
-    : `/catalog/products`;
+    ? `/admin/products?search=${encodeURIComponent(search)}`
+    : `/admin/products`;
 
   return client
-    .get<{ data: Product[] }>(url)
-    .then(res => res.data);
+    .get<any>(url)
+    .then(res => res.data); 
 }
+
+/* UPDATE */
 
 export function updateProduct(id: number, data: any) {
-  return client.put(`/admin/products/${id}`, data)
+  return client.put(`/admin/products/${id}`, data);
 }
+
+/* DELETE */
 
 export function deleteProduct(id: number) {
-  return client.delete(`/admin/products/${id}`)
+  return client.delete(`/admin/products/${id}`);
 }
+
 /* GET SINGLE PRODUCT */
 
-export function getProduct(slug: string): Promise<Product> {
+export function getProduct(id: number): Promise<Product> {
   return client
-    .get<{ data: Product }>(`/catalog/products/${slug}`)
+    .get<{ data: Product }>(`/admin/products/${id}`)
     .then(res => res.data);
 }
 
 /* CREATE */
 
 export function createProduct(data: {
-    name: string
-    part_number: string
-    brand_id: number
-  }) {
-    return client.post("/admin/products", data)
+  name: string
+  category_id: number
+  brand_id?: number | null
+  part_number?: string | null
+  cost_price?: number | null
+  selling_price: number
+  promo_price?: number | null
+}) {
+  return client.post("/admin/products", data);
 }
 
 /* UPLOAD PRODUCT IMAGE */
 
 export async function uploadProductImage(productId: number, file: File) {
-  const form = new FormData()
-  form.append("image", file)
+
+  const form = new FormData();
+  form.append("image", file);
 
   const res = await fetch(
     `http://127.0.0.1:8000/api/admin/products/${productId}/images`,
@@ -63,15 +82,15 @@ export async function uploadProductImage(productId: number, file: File) {
       method: "POST",
       body: form
     }
-  )
+  );
 
   if (!res.ok) {
-    const text = await res.text()
-    console.error(text)
-    throw new Error("Upload failed")
+    const text = await res.text();
+    console.error(text);
+    throw new Error("Upload failed");
   }
 
-  return res.json()
+  return res.json();
 }
 
 /* ATTACH ATTRIBUTES */
