@@ -19,8 +19,7 @@ import {
   uploadProductImage,
   attachAttributes,
   addAliases,
-  addCrossReferences,
-  addVariants
+  addCrossReferences
 } from "../services/products";
 
 type ProductForm = {
@@ -180,21 +179,24 @@ export default function CreateProduct() {
         cost_price: form.cost_price ? Number(form.cost_price) : null,
         selling_price: Number(form.selling_price || 0),
         promo_price: form.promo_price ? Number(form.promo_price) : null,
+        variants: variantsPayload,
 
         status: form.status
       });
 
       const productId = product.id ?? product.data?.id;
-
-      if (variantsPayload.length) {
-        await addVariants(productId, variantsPayload);
-      }
+      const postCreateWarnings: string[] = [];
 
       console.log("Images to upload:", form.images);
 
       for (const img of form.images) {
         if (img?.file) {
-          await uploadProductImage(productId, img.file);
+          try {
+            await uploadProductImage(productId, img.file);
+          } catch {
+            postCreateWarnings.push("One or more gallery images failed to upload.");
+            break;
+          }
         }
       }
 
@@ -206,18 +208,34 @@ export default function CreateProduct() {
       );
 
       if (attrs.length) {
-        await attachAttributes(productId, attrs);
+        try {
+          await attachAttributes(productId, attrs);
+        } catch {
+          postCreateWarnings.push("Attributes failed to attach.");
+        }
       }
 
       if (form.aliases?.length) {
-        await addAliases(productId, form.aliases);
+        try {
+          await addAliases(productId, form.aliases);
+        } catch {
+          postCreateWarnings.push("Aliases failed to save.");
+        }
       }
 
       if (form.cross_refs?.length) {
-        await addCrossReferences(productId, form.cross_refs);
+        try {
+          await addCrossReferences(productId, form.cross_refs);
+        } catch {
+          postCreateWarnings.push("Cross references failed to save.");
+        }
       }
 
-      alert("Product and variants created successfully");
+      if (postCreateWarnings.length) {
+        alert(`Product and variants were created, but some follow-up actions failed:\n- ${postCreateWarnings.join("\n- ")}`);
+      } else {
+        alert("Product and variants created successfully");
+      }
 
     } catch (err) {
       console.error(err);
