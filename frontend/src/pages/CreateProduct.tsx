@@ -53,6 +53,8 @@ type ProductForm = {
     selling_price: string
     promo_price: string
     stock: string
+    source?: "generated" | "manual"
+    generated_key?: string
   }[]
 
   attribute_values: Record<number, string>
@@ -130,6 +132,67 @@ export default function CreateProduct() {
     }
 
   }, [brands]);
+
+  useEffect(() => {
+    if (!attributes?.length) return;
+
+    setForm(prev => {
+      const selectedSelectAttributes = Object.entries(prev.attribute_values)
+        .map(([id, value]) => {
+          const attr = attributes.find((a: any) => a.id === Number(id));
+          return { attr, value };
+        })
+        .filter(({ attr, value }) =>
+          attr?.type === "select" &&
+          Array.isArray(value) &&
+          value.length > 0
+        );
+
+      if (!selectedSelectAttributes.length) {
+        return {
+          ...prev,
+          variants: prev.variants.filter(v => v.source !== "generated")
+        };
+      }
+
+      let combos: string[][] = [[]];
+      for (const { value } of selectedSelectAttributes) {
+        const options = Array.isArray(value) ? value : [];
+        combos = combos.flatMap(c => options.map(v => [...c, v]));
+      }
+
+      const existingGenerated = new Map(
+        prev.variants
+          .filter(v => v.source === "generated" && v.generated_key)
+          .map(v => [v.generated_key as string, v])
+      );
+
+      const generatedVariants = combos.map(combo => {
+        const key = combo.join(" / ");
+        const existing = existingGenerated.get(key);
+
+        if (existing) return existing;
+
+        return {
+          sku: combo.join("-").toLowerCase().replace(/\s+/g, "-"),
+          part_number: "",
+          cost_price: prev.cost_price || "0",
+          selling_price: prev.selling_price || "0",
+          promo_price: prev.promo_price || "0",
+          stock: "0",
+          source: "generated" as const,
+          generated_key: key,
+        };
+      });
+
+      const manualVariants = prev.variants.filter(v => v.source !== "generated");
+
+      return {
+        ...prev,
+        variants: [...generatedVariants, ...manualVariants],
+      };
+    });
+  }, [attributes, form.attribute_values]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 
@@ -284,13 +347,14 @@ export default function CreateProduct() {
                         cost_price: "",
                         selling_price: "",
                         promo_price: "",
-                        stock: "0"
+                        stock: "0",
+                        source: "manual"
                       }
                     ]
                   }))
                 }
               >
-                Add Variant
+                Add Manual Variant
               </button>
             </div>
 
@@ -310,6 +374,9 @@ export default function CreateProduct() {
                         })
                       }
                     />
+                    {variant.source === "generated" && (
+                      <div className="text-[11px] text-gray-500 mt-1">Auto-generated from attributes</div>
+                    )}
                   </div>
 
                   <div className="col-span-2">
