@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\Admin\ProductAliasController as AdminProductAliasCo
 use App\Http\Controllers\Api\Admin\CrossReferenceController as AdminCrossReferenceController;
 use App\Http\Controllers\Api\Admin\ProductAttributeController as AdminProductAttributeController;
 use App\Http\Controllers\Api\Admin\ProductCategoryController as AdminProductCategoryController;
+use App\Http\Controllers\Api\Admin\ProductVariantController as AdminProductVariantController;
 
 
 
@@ -151,5 +152,13 @@ Route::prefix('admin')->group(function () {
     Route::post('/products/{product}/attributes', [AdminProductAttributeController::class, 'store']);
     Route::get('/products/{product}/attributes', [AdminProductAttributeController::class, 'index']);
     Route::delete('/product-attributes/{id}', [AdminProductAttributeController::class, 'destroy']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Product Variants
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/products/{product}/variants', [AdminProductVariantController::class, 'index']);
+    Route::post('/products/{product}/variants', [AdminProductVariantController::class, 'store']);
 
 });

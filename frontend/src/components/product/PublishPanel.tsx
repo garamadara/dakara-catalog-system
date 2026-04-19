@@ -1,4 +1,4 @@
-export default function PublishPanel({ form, setForm }: any) {
+export default function PublishPanel({ form, setForm, isSubmitting }: any) {
 
 function update(value:string){
 
@@ -44,9 +44,10 @@ Published
 
 <button
 type="submit"
-className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700"
+disabled={isSubmitting}
+className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed"
 >
-Create Product
+{isSubmitting ? "Creating..." : "Create Product"}
 </button>
 
 </div>

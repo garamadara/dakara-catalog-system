@@ -5,6 +5,15 @@ export interface Product {
   name: string
   selling_price: number
   status: "draft" | "published"
+  variants?: {
+    id: number
+    sku: string | null
+    part_number: string | null
+    cost_price: number | null
+    selling_price: number | null
+    promo_price: number | null
+    stock: number
+  }[]
 
   thumbnail?: {
     image_url: string
@@ -65,6 +74,15 @@ export function createProduct(data: {
   cost_price?: number | null
   selling_price: number
   promo_price?: number | null
+  status?: "draft" | "published"
+  variants?: {
+    sku?: string | null
+    part_number?: string | null
+    cost_price?: number | null
+    selling_price?: number | null
+    promo_price?: number | null
+    stock?: number
+  }[]
 }) {
   return client.post("/admin/products", data);
 }
@@ -121,4 +139,17 @@ export function addCrossReferences(productId: number, references: any[]) {
     references
   });
 
+}
+
+/* ADD VARIANTS */
+
+export function addVariants(productId: number, variants: {
+  sku?: string | null
+  part_number?: string | null
+  cost_price?: number | null
+  selling_price?: number | null
+  promo_price?: number | null
+  stock?: number
+}[]) {
+  return client.post(`/admin/products/${productId}/variants`, { variants });
 }

@@ -19,7 +19,8 @@ import {
   uploadProductImage,
   attachAttributes,
   addAliases,
-  addCrossReferences
+  addCrossReferences,
+  addVariants
 } from "../services/products";
 
 type ProductForm = {
@@ -46,6 +47,15 @@ type ProductForm = {
 
   images: any[]
 
+  variants: {
+    sku: string
+    part_number: string
+    cost_price: string
+    selling_price: string
+    promo_price: string
+    stock: string
+  }[]
+
   attribute_values: Record<number, string>
 
   status: "draft" | "published"
@@ -55,6 +65,8 @@ type ProductForm = {
 }
 
 export default function CreateProduct() {
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form,setForm] = useState<ProductForm>({
     name:"",
@@ -75,6 +87,8 @@ export default function CreateProduct() {
     cross_refs:[],
 
     images:[],
+
+    variants: [],
 
     attribute_values:{},
 
@@ -122,7 +136,12 @@ export default function CreateProduct() {
 
     e.preventDefault();
 
+    if (isSubmitting) {
+      return;
+    }
+
     try {
+      setIsSubmitting(true);
 
       if (!form.name) {
         alert("Product name is required");
@@ -133,6 +152,24 @@ export default function CreateProduct() {
         alert("Category is required");
         return;
       }
+
+      const variantsPayload = form.variants
+        .filter(v =>
+          v.sku.trim() ||
+          v.part_number.trim() ||
+          v.cost_price.trim() ||
+          v.selling_price.trim() ||
+          v.promo_price.trim() ||
+          v.stock.trim()
+        )
+        .map(v => ({
+          sku: v.sku.trim() || null,
+          part_number: v.part_number.trim() || null,
+          cost_price: v.cost_price ? Number(v.cost_price) : 0,
+          selling_price: v.selling_price ? Number(v.selling_price) : 0,
+          promo_price: v.promo_price ? Number(v.promo_price) : 0,
+          stock: v.stock ? Number(v.stock) : 0
+        }));
 
       const product = await createProduct({
         name: form.name,
@@ -148,6 +185,10 @@ export default function CreateProduct() {
       });
 
       const productId = product.id ?? product.data?.id;
+
+      if (variantsPayload.length) {
+        await addVariants(productId, variantsPayload);
+      }
 
       console.log("Images to upload:", form.images);
 
@@ -176,11 +217,13 @@ export default function CreateProduct() {
         await addCrossReferences(productId, form.cross_refs);
       }
 
-      alert("Product created successfully");
+      alert("Product and variants created successfully");
 
     } catch (err) {
       console.error(err);
       alert("Failed to create product");
+    } finally {
+      setIsSubmitting(false);
     }
 
   }
@@ -206,6 +249,157 @@ export default function CreateProduct() {
 
           <GallerySection form={form} setForm={setForm} />
 
+          <section className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Variants</h2>
+              <button
+                type="button"
+                className="px-3 py-1.5 text-sm rounded bg-gray-900 text-white"
+                onClick={() =>
+                  setForm(prev => ({
+                    ...prev,
+                    variants: [
+                      ...prev.variants,
+                      {
+                        sku: "",
+                        part_number: "",
+                        cost_price: "",
+                        selling_price: "",
+                        promo_price: "",
+                        stock: "0"
+                      }
+                    ]
+                  }))
+                }
+              >
+                Add Variant
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {form.variants.map((variant, index) => (
+                <div key={index} className="grid grid-cols-12 gap-3 items-end border rounded-lg p-3">
+                  <div className="col-span-2">
+                    <label className="block text-xs mb-1">SKU</label>
+                    <input
+                      className="w-full border rounded px-3 py-2"
+                      value={variant.sku}
+                      onChange={(e) =>
+                        setForm(prev => {
+                          const variants = [...prev.variants];
+                          variants[index] = { ...variants[index], sku: e.target.value };
+                          return { ...prev, variants };
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-xs mb-1">Part #</label>
+                    <input
+                      className="w-full border rounded px-3 py-2"
+                      value={variant.part_number}
+                      onChange={(e) =>
+                        setForm(prev => {
+                          const variants = [...prev.variants];
+                          variants[index] = { ...variants[index], part_number: e.target.value };
+                          return { ...prev, variants };
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-xs mb-1">Cost</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      className="w-full border rounded px-3 py-2"
+                      value={variant.cost_price}
+                      onChange={(e) =>
+                        setForm(prev => {
+                          const variants = [...prev.variants];
+                          variants[index] = { ...variants[index], cost_price: e.target.value };
+                          return { ...prev, variants };
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-xs mb-1">Selling</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      className="w-full border rounded px-3 py-2"
+                      value={variant.selling_price}
+                      onChange={(e) =>
+                        setForm(prev => {
+                          const variants = [...prev.variants];
+                          variants[index] = { ...variants[index], selling_price: e.target.value };
+                          return { ...prev, variants };
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-xs mb-1">Promo</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      className="w-full border rounded px-3 py-2"
+                      value={variant.promo_price}
+                      onChange={(e) =>
+                        setForm(prev => {
+                          const variants = [...prev.variants];
+                          variants[index] = { ...variants[index], promo_price: e.target.value };
+                          return { ...prev, variants };
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-span-1">
+                    <label className="block text-xs mb-1">Stock</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      className="w-full border rounded px-3 py-2"
+                      value={variant.stock}
+                      onChange={(e) =>
+                        setForm(prev => {
+                          const variants = [...prev.variants];
+                          variants[index] = { ...variants[index], stock: e.target.value };
+                          return { ...prev, variants };
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div className="col-span-1">
+                    <button
+                      type="button"
+                      className="text-sm text-red-600"
+                      onClick={() =>
+                        setForm(prev => ({
+                          ...prev,
+                          variants: prev.variants.filter((_, i) => i !== index)
+                        }))
+                      }
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
           <AliasSection form={form} setForm={setForm} />
 
           <CrossReferenceSection form={form} setForm={setForm} />
@@ -213,7 +407,7 @@ export default function CreateProduct() {
         </div>
 
         <div className="col-span-3">
-          <PublishPanel form={form} setForm={setForm} />
+          <PublishPanel form={form} setForm={setForm} isSubmitting={isSubmitting} />
         </div>
 
       </div>

@@ -87,6 +87,11 @@ class Product extends Model
         return $this->hasMany(ProductCrossReference::class);
     }
 
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
     public static function generateSlug(string $name, string $partNumber): string
     {
         return Str::slug($name . '-' . $partNumber);
