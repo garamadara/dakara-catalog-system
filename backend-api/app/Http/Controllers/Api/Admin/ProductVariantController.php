@@ -15,6 +15,8 @@ class ProductVariantController extends Controller
 
     public function store(Request $request, Product $product)
     {
+        $replace = filter_var($request->input('replace', false), FILTER_VALIDATE_BOOLEAN);
+
         $data = $request->validate([
             'variants' => 'sometimes|array',
             'generated_variants' => 'sometimes|array',
@@ -34,6 +36,10 @@ class ProductVariantController extends Controller
             return response()->json([
                 'message' => 'No valid variants in payload.',
             ], 422);
+        }
+
+        if ($replace) {
+            $product->variants()->delete();
         }
 
         foreach ($normalizedVariants as $variant) {

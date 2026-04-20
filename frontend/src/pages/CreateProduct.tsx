@@ -9,6 +9,7 @@ import PublishPanel from "../components/product/PublishPanel";
 import AttributeSection from "../components/product/AttributeSection";
 
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { getCategories } from "../services/categories";
 import { getBrands } from "../services/brands";
@@ -66,6 +67,7 @@ type ProductForm = {
 }
 
 export default function CreateProduct() {
+  const navigate = useNavigate();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -304,9 +306,9 @@ export default function CreateProduct() {
 
       if (postCreateWarnings.length) {
         alert(`Product and variants were created, but some follow-up actions failed:\n- ${postCreateWarnings.join("\n- ")}`);
-      } else {
-        alert("Product and variants created successfully");
       }
+
+      navigate("/products");
 
     } catch (err) {
       console.error(err);
