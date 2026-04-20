@@ -10,6 +10,7 @@ export default function AttributeSection({ form, setForm }: any) {
   });
 
   const values = form.attribute_values || {};
+  const canEditAttributes = Boolean(form?.name?.trim());
   const [selectedAttr, setSelectedAttr] = useState("");
 
   function update(id: number, value: any) {
@@ -78,6 +79,11 @@ export default function AttributeSection({ form, setForm }: any) {
         <p className="text-xs text-gray-500 mt-1">
           Add product specifications.
         </p>
+        {!canEditAttributes && (
+          <p className="text-xs text-amber-600 mt-2">
+            Fill Product Name first to enable attributes.
+          </p>
+        )}
 
       </div>
 
@@ -105,6 +111,7 @@ export default function AttributeSection({ form, setForm }: any) {
             "
             value={selectedAttr}
             onChange={(e) => setSelectedAttr(e.target.value)}
+            disabled={!canEditAttributes}
           >
 
             <option value="">Select attribute</option>
@@ -122,6 +129,7 @@ export default function AttributeSection({ form, setForm }: any) {
           <button
             type="button"
             onClick={addAttribute}
+            disabled={!canEditAttributes}
             className="
             bg-green-600
             hover:bg-green-700
@@ -132,6 +140,8 @@ export default function AttributeSection({ form, setForm }: any) {
             py-2
             rounded-md
             transition
+            disabled:opacity-60
+            disabled:cursor-not-allowed
             "
           >
             Add
@@ -193,6 +203,7 @@ export default function AttributeSection({ form, setForm }: any) {
                                   type="checkbox"
                                   className="accent-green-600"
                                   checked={checked}
+                                  disabled={!canEditAttributes}
                                   onChange={(e) => {
 
                                     let updated = [...selectedValues];
@@ -231,6 +242,7 @@ export default function AttributeSection({ form, setForm }: any) {
                           type="checkbox"
                           className="accent-green-600"
                           checked={values[id] === "true"}
+                          disabled={!canEditAttributes}
                           onChange={(e) =>
                             update(id, e.target.checked ? "true" : "false")
                           }
@@ -260,6 +272,7 @@ export default function AttributeSection({ form, setForm }: any) {
                           focus:ring-green-500
                           "
                           value={values[id] || ""}
+                          disabled={!canEditAttributes}
                           onChange={(e) => update(id, e.target.value)}
                         />
                       );
@@ -285,6 +298,7 @@ export default function AttributeSection({ form, setForm }: any) {
                         "
                         placeholder={`Enter ${attr.name}`}
                         value={values[id] || ""}
+                        disabled={!canEditAttributes}
                         onChange={(e) => update(id, e.target.value)}
                       />
                     );
@@ -300,6 +314,7 @@ export default function AttributeSection({ form, setForm }: any) {
                   <button
                     type="button"
                     className="text-red-500 text-sm hover:underline"
+                    disabled={!canEditAttributes}
                     onClick={() => removeAttribute(id)}
                   >
                     Remove

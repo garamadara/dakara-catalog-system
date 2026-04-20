@@ -170,11 +170,19 @@ export default function CreateProduct() {
       const generatedVariants = combos.map(combo => {
         const key = combo.join(" / ");
         const existing = existingGenerated.get(key);
+        const baseName = (prev.name || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+        const optionSlug = combo.join("-").toLowerCase().replace(/\s+/g, "-");
+        const generatedSku = [baseName, optionSlug].filter(Boolean).join("-");
 
-        if (existing) return existing;
+        if (existing) {
+          return {
+            ...existing,
+            sku: generatedSku
+          };
+        }
 
         return {
-          sku: combo.join("-").toLowerCase().replace(/\s+/g, "-"),
+          sku: generatedSku,
           part_number: "",
           cost_price: prev.cost_price || "0",
           selling_price: prev.selling_price || "0",
@@ -192,7 +200,7 @@ export default function CreateProduct() {
         variants: [...generatedVariants, ...manualVariants],
       };
     });
-  }, [attributes, form.attribute_values]);
+  }, [attributes, form.attribute_values, form.name]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 
@@ -328,8 +336,6 @@ export default function CreateProduct() {
             attributes={attributes || []}
           />
 
-          <GallerySection form={form} setForm={setForm} />
-
           <section className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Variants</h2>
@@ -362,7 +368,11 @@ export default function CreateProduct() {
               {form.variants.map((variant, index) => (
                 <div key={index} className="grid grid-cols-12 gap-3 items-end border rounded-lg p-3">
                   <div className="col-span-2">
-                    <label className="block text-xs mb-1">SKU</label>
+                    <label className="block text-xs mb-1">
+                      {variant.source === "generated"
+                        ? 'SKU (Auto-generated from attributes)'
+                        : "SKU"}
+                    </label>
                     <input
                       className="w-full border rounded px-3 py-2"
                       value={variant.sku}
@@ -374,9 +384,6 @@ export default function CreateProduct() {
                         })
                       }
                     />
-                    {variant.source === "generated" && (
-                      <div className="text-[11px] text-gray-500 mt-1">Auto-generated from attributes</div>
-                    )}
                   </div>
 
                   <div className="col-span-2">
@@ -484,6 +491,8 @@ export default function CreateProduct() {
               ))}
             </div>
           </section>
+
+          <GallerySection form={form} setForm={setForm} />
 
           <AliasSection form={form} setForm={setForm} />
 
