@@ -253,6 +253,8 @@ export default function CreateProduct() {
         category_id: form.category_id,
         brand_id: form.brand_id,
         part_number: form.part_number || null,
+        description: form.description || null,
+        public_description: form.public_description || null,
 
         cost_price: form.cost_price ? Number(form.cost_price) : null,
         selling_price: Number(form.selling_price || 0),
@@ -445,7 +447,7 @@ export default function CreateProduct() {
                     <input
                       type="number"
                       min="0"
-                      step="0.01"
+                      step="1"
                       className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.cost_price}
                       onChange={(e) =>
@@ -463,7 +465,7 @@ export default function CreateProduct() {
                     <input
                       type="number"
                       min="0"
-                      step="0.01"
+                      step="1"
                       className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.selling_price}
                       onChange={(e) =>
@@ -481,7 +483,7 @@ export default function CreateProduct() {
                     <input
                       type="number"
                       min="0"
-                      step="0.01"
+                      step="1"
                       className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.promo_price}
                       onChange={(e) =>

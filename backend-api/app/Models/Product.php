@@ -16,6 +16,8 @@ class Product extends Model
         'part_number',
         'normalized_part_number',
         'brand_id',
+        'description',
+        'public_description',
 
         'cost_price',
         'selling_price',

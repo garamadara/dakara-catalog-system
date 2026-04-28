@@ -117,6 +117,8 @@ export default function EditProduct() {
         part_number: form.part_number || null,
         brand_id: form.brand_id,
         category_id: form.category_id,
+        description: form.description || null,
+        public_description: form.public_description || null,
         cost_price: form.cost_price ? Number(form.cost_price) : null,
         selling_price: Number(form.selling_price || 0),
         promo_price: form.promo_price ? Number(form.promo_price) : null,
@@ -280,7 +282,7 @@ export default function EditProduct() {
                     <input
                       type="number"
                       min="0"
-                      step="0.01"
+                      step="1"
                       className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.cost_price}
                       onChange={(e) =>
@@ -297,7 +299,7 @@ export default function EditProduct() {
                     <input
                       type="number"
                       min="0"
-                      step="0.01"
+                      step="1"
                       className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.selling_price}
                       onChange={(e) =>
@@ -314,7 +316,7 @@ export default function EditProduct() {
                     <input
                       type="number"
                       min="0"
-                      step="0.01"
+                      step="1"
                       className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.promo_price}
                       onChange={(e) =>

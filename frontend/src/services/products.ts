@@ -77,6 +77,8 @@ export function createProduct(data: {
   category_id: number
   brand_id?: number | null
   part_number?: string | null
+  description?: string | null
+  public_description?: string | null
   cost_price?: number | null
   selling_price: number
   promo_price?: number | null

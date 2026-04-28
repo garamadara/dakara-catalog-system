@@ -68,6 +68,8 @@ class ProductController extends Controller
             'brand_id' => 'nullable|exists:brands,id',
 
             'part_number' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'public_description' => 'nullable|string',
 
             'cost_price' => 'nullable|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
@@ -175,6 +177,8 @@ class ProductController extends Controller
             'brand_id' => 'nullable|exists:brands,id',
 
             'part_number' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'public_description' => 'nullable|string',
 
             'cost_price' => 'nullable|numeric|min:0',
             'selling_price' => 'sometimes|numeric|min:0',

@@ -68,7 +68,7 @@ export default function Products() {
       header: "Price",
       accessor: (p: Product) => (
         <span className="text-sm font-medium text-gray-700">
-          $${Number(p.selling_price || 0).toFixed(2)}
+          ${Number(p.selling_price || 0).toFixed(2)}
         </span>
       ),
     },
