@@ -1,10 +1,13 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../lib/api";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { createAttribute, getAttribute, updateAttribute } from "../services/attributes";
 
 export default function CreateAttribute() {
 
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = Boolean(id);
 
   const [form, setForm] = useState({
     name: "",
@@ -16,6 +19,23 @@ export default function CreateAttribute() {
   function update(key: string, value: any) {
     setForm({ ...form, [key]: value });
   }
+
+  const { data: existingAttribute } = useQuery({
+    queryKey: ["attribute", id],
+    enabled: isEdit,
+    queryFn: () => getAttribute(Number(id)),
+  });
+
+  useEffect(() => {
+    if (existingAttribute) {
+      setForm({
+        name: existingAttribute.name || "",
+        slug: existingAttribute.slug || "",
+        type: existingAttribute.type || "text",
+        options: Array.isArray(existingAttribute.options) ? existingAttribute.options.join(", ") : "",
+      });
+    }
+  }, [existingAttribute]);
 
   async function handleSave(e: any) {
 
@@ -35,7 +55,11 @@ export default function CreateAttribute() {
           .map((v) => v.trim());
       }
 
-      await api.post("/admin/attributes", payload);
+      if (isEdit) {
+        await updateAttribute(Number(id), payload);
+      } else {
+        await createAttribute(payload);
+      }
 
       navigate("/attributes");
 
@@ -50,7 +74,7 @@ export default function CreateAttribute() {
     <div className="space-y-6">
 
       <h1 className="text-2xl font-semibold">
-        Create Attribute
+        {isEdit ? "Edit Attribute" : "Create Attribute"}
       </h1>
 
       <form
@@ -129,7 +153,7 @@ export default function CreateAttribute() {
             type="submit"
             className="bg-green-600 text-white px-6 py-2 rounded"
           >
-            Save Attribute
+            {isEdit ? "Save Changes" : "Save Attribute"}
           </button>
         </div>
 

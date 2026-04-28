@@ -87,6 +87,10 @@ Route::prefix('admin')->group(function () {
     */
     Route::get('/brands', [AdminBrandController::class, 'index']);
     Route::post('/brands', [AdminBrandController::class, 'store']);
+    Route::get('/brands/{brand}', [AdminBrandController::class, 'show']);
+    Route::put('/brands/{brand}', [AdminBrandController::class, 'update']);
+    Route::delete('/brands/{brand}', [AdminBrandController::class, 'destroy']);
+    Route::get('/brands/{brand}/logo', [AdminBrandController::class, 'logo']);
 
     /*
     |--------------------------------------------------------------------------
@@ -96,6 +100,10 @@ Route::prefix('admin')->group(function () {
 
     Route::get('/categories', [AdminCategoryController::class, 'index']);
     Route::post('/categories', [AdminCategoryController::class, 'store']);
+    Route::get('/categories/{category}', [AdminCategoryController::class, 'show']);
+    Route::put('/categories/{category}', [AdminCategoryController::class, 'update']);
+    Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy']);
+    Route::get('/categories/{category}/image', [AdminCategoryController::class, 'image']);
 
     Route::post('/products/{product}/categories', [AdminProductCategoryController::class, 'attach']);
     Route::delete('/products/{product}/categories/{category}', [AdminProductCategoryController::class, 'detach']);
@@ -142,6 +150,9 @@ Route::prefix('admin')->group(function () {
 
     Route::get('/attributes', [AdminAttributeController::class, 'index']);
     Route::post('/attributes', [AdminAttributeController::class, 'store']);
+    Route::get('/attributes/{attribute}', [AdminAttributeController::class, 'show']);
+    Route::put('/attributes/{attribute}', [AdminAttributeController::class, 'update']);
+    Route::delete('/attributes/{attribute}', [AdminAttributeController::class, 'destroy']);
 
 
     /*

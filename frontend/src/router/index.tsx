@@ -32,12 +32,15 @@ export default function Router() {
 
           <Route path="/categories" element={<Categories />} />
           <Route path="/categories/create" element={<CreateCategory />} />
+          <Route path="/categories/:id/edit" element={<CreateCategory />} />
 
           <Route path="/brands" element={<Brands />} />
           <Route path="/brands/create" element={<CreateBrand />} />
+          <Route path="/brands/:id/edit" element={<CreateBrand />} />
 
           <Route path="/attributes" element={<Attributes />} />
           <Route path="/attributes/create" element={<CreateAttribute />} />
+          <Route path="/attributes/:id/edit" element={<CreateAttribute />} />
 
         </Route>
 
