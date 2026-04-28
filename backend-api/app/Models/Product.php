@@ -21,7 +21,8 @@ class Product extends Model
         'selling_price',
         'promo_price',
         'promo_start',
-        'promo_end'
+        'promo_end',
+        'status'
     ];
 
     protected static function boot()

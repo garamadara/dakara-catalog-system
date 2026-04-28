@@ -72,6 +72,7 @@ class ProductController extends Controller
             'cost_price' => 'nullable|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
             'promo_price' => 'nullable|numeric|min:0',
+            'status' => 'sometimes|in:draft,published',
 
             'promo_start' => 'nullable|date',
             'promo_end' => 'nullable|date',
@@ -93,6 +94,7 @@ class ProductController extends Controller
 
         // Ensure selling price default
         $data['selling_price'] = $data['selling_price'] ?? 0;
+        $data['status'] = $data['status'] ?? 'draft';
 
         $normalizedVariants = $this->normalizeVariants(
             $this->extractRawVariants($request)
@@ -177,6 +179,7 @@ class ProductController extends Controller
             'cost_price' => 'nullable|numeric|min:0',
             'selling_price' => 'sometimes|numeric|min:0',
             'promo_price' => 'nullable|numeric|min:0',
+            'status' => 'sometimes|in:draft,published',
 
             'promo_start' => 'nullable|date',
             'promo_end' => 'nullable|date',
