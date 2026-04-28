@@ -6,7 +6,9 @@ import PageHeader from "../components/PageHeader";
 import BasicInfoSection from "../components/product/BasicInfoSection";
 import PricingSection from "../components/product/PricingSection";
 import DescriptionSection from "../components/product/DescriptionSection";
+import GallerySection from "../components/product/GallerySection";
 import PublishPanel from "../components/product/PublishPanel";
+import { uploadProductImage } from "../services/products";
 
 type VariantForm = {
   id?: number
@@ -30,6 +32,7 @@ type ProductForm = {
   public_description: string
   status: "draft" | "published"
   variants: VariantForm[]
+  images: any[]
   categories?: any[]
   brands?: any[]
 };
@@ -50,6 +53,7 @@ export default function EditProduct() {
     public_description: "",
     status: "draft",
     variants: [],
+    images: [],
     categories: [],
     brands: [],
   });
@@ -85,6 +89,11 @@ export default function EditProduct() {
         promo_price: variant.promo_price?.toString() || "",
         stock: variant.stock?.toString() || "0",
       })),
+      images: (product.images || []).map((image: any) => ({
+        id: image.id,
+        image_url: image.image_url,
+        preview: image.image_url,
+      })),
       brands: data.brands || [],
       categories: data.categories || [],
     });
@@ -115,6 +124,12 @@ export default function EditProduct() {
           stock: v.stock ? Number(v.stock) : 0,
         })),
       });
+
+      for (const image of form.images) {
+        if (image?.file) {
+          await uploadProductImage(Number(id), image.file);
+        }
+      }
     },
     onSuccess: () => {
       alert("Product updated successfully");
@@ -144,6 +159,7 @@ export default function EditProduct() {
           <BasicInfoSection form={form} setForm={setForm} />
           <PricingSection form={form} setForm={setForm} />
           <DescriptionSection form={form} setForm={setForm} />
+          <GallerySection form={form} setForm={setForm} />
 
           <section className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between mb-4">
