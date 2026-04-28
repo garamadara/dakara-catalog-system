@@ -19,6 +19,10 @@ class ProductImage extends Model
 
     public function getImageUrlAttribute($value)
     {
-        return asset('storage/' . $value);
+        if (empty($this->id) || empty($value)) {
+            return $value;
+        }
+
+        return url('/api/admin/product-images/' . $this->id . '/file');
     }
 }

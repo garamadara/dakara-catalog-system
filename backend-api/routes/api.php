@@ -108,6 +108,7 @@ Route::prefix('admin')->group(function () {
     */
 
     Route::post('/products/{product}/images', [AdminProductImageController::class, 'store']);
+    Route::get('/product-images/{image}/file', [AdminProductImageController::class, 'show']);
     Route::patch('/products/{product}/images/order', [AdminProductImageController::class, 'reorder']);
     Route::delete('/product-images/{id}', [AdminProductImageController::class, 'destroy']);
 
