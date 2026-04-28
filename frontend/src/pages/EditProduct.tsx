@@ -308,7 +308,13 @@ export default function EditProduct() {
         </div>
 
         <div className="col-span-3">
-          <PublishPanel form={form} setForm={setForm} isSubmitting={mutation.isPending} />
+          <PublishPanel
+            form={form}
+            setForm={setForm}
+            isSubmitting={mutation.isPending}
+            submitLabel="Save"
+            submittingLabel="Saving..."
+          />
         </div>
       </div>
     </form>
