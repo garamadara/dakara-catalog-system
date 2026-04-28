@@ -257,7 +257,17 @@ export default function CreateProduct() {
         status: form.status
       });
 
-      const productId = product.id ?? product.data?.id;
+      const rawProductId =
+        product?.id
+        ?? product?.data?.id
+        ?? product?.product?.id
+        ?? product?.data?.product?.id;
+
+      const productId = Number(rawProductId);
+
+      if (!Number.isFinite(productId) || productId <= 0) {
+        throw new Error("Create product succeeded but no valid product id was returned.");
+      }
       const postCreateWarnings: string[] = [];
 
       console.log("Images to upload:", form.images);
