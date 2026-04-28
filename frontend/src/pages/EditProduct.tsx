@@ -40,6 +40,7 @@ type ProductForm = {
 export default function EditProduct() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [originalImageIds, setOriginalImageIds] = useState<number[]>([]);
 
   const [form, setForm] = useState<ProductForm>({
     name: "",
@@ -68,6 +69,13 @@ export default function EditProduct() {
     if (!data?.product) return;
 
     const product = data.product;
+    const loadedImages = (product.images || []).map((image: any) => ({
+      id: image.id,
+      image_url: image.image_url,
+      preview: image.image_url,
+    }));
+
+    setOriginalImageIds(loadedImages.map((image: any) => image.id).filter(Boolean));
 
     setForm({
       name: product.name || "",
@@ -89,11 +97,7 @@ export default function EditProduct() {
         promo_price: variant.promo_price?.toString() || "",
         stock: variant.stock?.toString() || "0",
       })),
-      images: (product.images || []).map((image: any) => ({
-        id: image.id,
-        image_url: image.image_url,
-        preview: image.image_url,
-      })),
+      images: loadedImages,
       brands: data.brands || [],
       categories: data.categories || [],
     });
@@ -126,10 +130,40 @@ export default function EditProduct() {
         })),
       });
 
-      for (const image of form.images) {
+      const uploadedImageIdsByIndex = new Map<number, number>();
+
+      for (const [index, image] of form.images.entries()) {
         if (image?.file) {
-          await uploadProductImage(id, image.file);
+          const uploaded = await uploadProductImage(id, image.file);
+          if (uploaded?.id) {
+            uploadedImageIdsByIndex.set(index, uploaded.id);
+          }
         }
+      }
+
+      const currentExistingImageIds = form.images
+        .map(image => image?.id)
+        .filter((imageId): imageId is number => typeof imageId === "number");
+
+      const removedImageIds = originalImageIds.filter(
+        imageId => !currentExistingImageIds.includes(imageId)
+      );
+
+      for (const removedImageId of removedImageIds) {
+        await client.delete(`/admin/product-images/${removedImageId}`);
+      }
+
+      const orderedImageIds = form.images
+        .map((image, index) => image?.id ?? uploadedImageIdsByIndex.get(index))
+        .filter((imageId): imageId is number => typeof imageId === "number");
+
+      if (orderedImageIds.length) {
+        await client.patch(`/admin/products/${id}/images/order`, {
+          images: orderedImageIds.map((imageId, sort_order) => ({
+            id: imageId,
+            sort_order,
+          })),
+        });
       }
     },
     onSuccess: () => {
