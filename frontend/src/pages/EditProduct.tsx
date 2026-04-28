@@ -9,6 +9,7 @@ import DescriptionSection from "../components/product/DescriptionSection";
 import GallerySection from "../components/product/GallerySection";
 import PublishPanel from "../components/product/PublishPanel";
 import { uploadProductImage } from "../services/products";
+import Toast from "../components/ui/Toast";
 
 type VariantForm = {
   id?: number
@@ -41,6 +42,10 @@ export default function EditProduct() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [originalImageIds, setOriginalImageIds] = useState<number[]>([]);
+  const [toast, setToast] = useState<{
+    type: "success" | "error" | "warning";
+    message: string;
+  } | null>(null);
 
   const [form, setForm] = useState<ProductForm>({
     name: "",
@@ -167,11 +172,20 @@ export default function EditProduct() {
       }
     },
     onSuccess: () => {
-      alert("Product updated successfully");
-      navigate("/products");
+      navigate("/products", {
+        state: {
+          toast: {
+            type: "success",
+            message: "Product updated successfully.",
+          },
+        },
+      });
     },
     onError: () => {
-      alert("Failed to update product");
+      setToast({
+        type: "error",
+        message: "Failed to update product.",
+      });
     },
   });
 
@@ -185,6 +199,13 @@ export default function EditProduct() {
         mutation.mutate();
       }}
     >
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
       <div className="max-w-7xl mx-auto">
         <PageHeader title="Edit Product" />
       </div>
@@ -227,9 +248,9 @@ export default function EditProduct() {
               {form.variants.map((variant, index) => (
                 <div key={index} className="grid grid-cols-12 gap-3 items-end border rounded-lg p-3">
                   <div className="col-span-2">
-                    <label className="block text-xs mb-1">SKU</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">SKU</label>
                     <input
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.sku}
                       onChange={(e) =>
                         setForm(prev => {
@@ -241,9 +262,9 @@ export default function EditProduct() {
                     />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs mb-1">Part #</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Part #</label>
                     <input
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.part_number}
                       onChange={(e) =>
                         setForm(prev => {
@@ -255,12 +276,12 @@ export default function EditProduct() {
                     />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs mb-1">Cost</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Cost</label>
                     <input
                       type="number"
                       min="0"
                       step="0.01"
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.cost_price}
                       onChange={(e) =>
                         setForm(prev => {
@@ -272,12 +293,12 @@ export default function EditProduct() {
                     />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs mb-1">Selling</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Selling</label>
                     <input
                       type="number"
                       min="0"
                       step="0.01"
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.selling_price}
                       onChange={(e) =>
                         setForm(prev => {
@@ -289,12 +310,12 @@ export default function EditProduct() {
                     />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs mb-1">Promo</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Promo</label>
                     <input
                       type="number"
                       min="0"
                       step="0.01"
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.promo_price}
                       onChange={(e) =>
                         setForm(prev => {
@@ -306,12 +327,12 @@ export default function EditProduct() {
                     />
                   </div>
                   <div className="col-span-1">
-                    <label className="block text-xs mb-1">Stock</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Stock</label>
                     <input
                       type="number"
                       min="0"
                       step="1"
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.stock}
                       onChange={(e) =>
                         setForm(prev => {
@@ -325,7 +346,7 @@ export default function EditProduct() {
                   <div className="col-span-1">
                     <button
                       type="button"
-                      className="text-sm text-red-600"
+                      className="text-sm font-medium text-rose-600 hover:text-rose-700"
                       onClick={() =>
                         setForm(prev => ({
                           ...prev,

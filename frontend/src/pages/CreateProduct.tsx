@@ -7,6 +7,7 @@ import AliasSection from "../components/product/AliasSection";
 import CrossReferenceSection from "../components/product/CrossReferenceSection";
 import PublishPanel from "../components/product/PublishPanel";
 import AttributeSection from "../components/product/AttributeSection";
+import Toast from "../components/ui/Toast";
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -70,6 +71,10 @@ export default function CreateProduct() {
   const navigate = useNavigate();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState<{
+    type: "success" | "error" | "warning";
+    message: string;
+  } | null>(null);
 
   const [form,setForm] = useState<ProductForm>({
     name:"",
@@ -216,12 +221,12 @@ export default function CreateProduct() {
       setIsSubmitting(true);
 
       if (!form.name) {
-        alert("Product name is required");
+        setToast({ type: "warning", message: "Product name is required." });
         return;
       }
 
       if (!form.category_id) {
-        alert("Category is required");
+        setToast({ type: "warning", message: "Category is required." });
         return;
       }
 
@@ -315,14 +320,29 @@ export default function CreateProduct() {
       }
 
       if (postCreateWarnings.length) {
-        alert(`Product and variants were created, but some follow-up actions failed:\n- ${postCreateWarnings.join("\n- ")}`);
+        navigate("/products", {
+          state: {
+            toast: {
+              type: "warning",
+              message: `Product created, but some follow-up actions failed:\n- ${postCreateWarnings.join("\n- ")}`,
+            },
+          },
+        });
+        return;
       }
 
-      navigate("/products");
+      navigate("/products", {
+        state: {
+          toast: {
+            type: "success",
+            message: "Product created successfully.",
+          },
+        },
+      });
 
     } catch (err) {
       console.error(err);
-      alert("Failed to create product");
+      setToast({ type: "error", message: "Failed to create product." });
     } finally {
       setIsSubmitting(false);
     }
@@ -331,6 +351,13 @@ export default function CreateProduct() {
 
   return (
     <form onSubmit={handleSubmit} className="p-10 bg-gray-50 min-h-screen">
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
 
       <div className="grid grid-cols-12 gap-10 max-w-7xl mx-auto">
 
@@ -380,13 +407,13 @@ export default function CreateProduct() {
               {form.variants.map((variant, index) => (
                 <div key={index} className="grid grid-cols-12 gap-3 items-end border rounded-lg p-3">
                   <div className="col-span-2">
-                    <label className="block text-xs mb-1">
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
                       {variant.source === "generated"
                         ? 'SKU (Auto-generated from attributes)'
                         : "SKU"}
                     </label>
                     <input
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.sku}
                       onChange={(e) =>
                         setForm(prev => {
@@ -399,9 +426,9 @@ export default function CreateProduct() {
                   </div>
 
                   <div className="col-span-2">
-                    <label className="block text-xs mb-1">Part #</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Part #</label>
                     <input
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.part_number}
                       onChange={(e) =>
                         setForm(prev => {
@@ -414,12 +441,12 @@ export default function CreateProduct() {
                   </div>
 
                   <div className="col-span-2">
-                    <label className="block text-xs mb-1">Cost</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Cost</label>
                     <input
                       type="number"
                       min="0"
                       step="0.01"
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.cost_price}
                       onChange={(e) =>
                         setForm(prev => {
@@ -432,12 +459,12 @@ export default function CreateProduct() {
                   </div>
 
                   <div className="col-span-2">
-                    <label className="block text-xs mb-1">Selling</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Selling</label>
                     <input
                       type="number"
                       min="0"
                       step="0.01"
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.selling_price}
                       onChange={(e) =>
                         setForm(prev => {
@@ -450,12 +477,12 @@ export default function CreateProduct() {
                   </div>
 
                   <div className="col-span-2">
-                    <label className="block text-xs mb-1">Promo</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Promo</label>
                     <input
                       type="number"
                       min="0"
                       step="0.01"
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.promo_price}
                       onChange={(e) =>
                         setForm(prev => {
@@ -468,12 +495,12 @@ export default function CreateProduct() {
                   </div>
 
                   <div className="col-span-1">
-                    <label className="block text-xs mb-1">Stock</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Stock</label>
                     <input
                       type="number"
                       min="0"
                       step="1"
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border rounded px-3 py-2 text-sm text-gray-800"
                       value={variant.stock}
                       onChange={(e) =>
                         setForm(prev => {
@@ -488,7 +515,7 @@ export default function CreateProduct() {
                   <div className="col-span-1">
                     <button
                       type="button"
-                      className="text-sm text-red-600"
+                      className="text-sm font-medium text-rose-600 hover:text-rose-700"
                       onClick={() =>
                         setForm(prev => ({
                           ...prev,
