@@ -127,7 +127,7 @@ export default function EditProduct() {
 
       for (const image of form.images) {
         if (image?.file) {
-          await uploadProductImage(Number(id), image.file);
+          await uploadProductImage(id, image.file);
         }
       }
     },

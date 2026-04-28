@@ -95,7 +95,7 @@ export function createProduct(data: {
 
 /* UPLOAD PRODUCT IMAGE */
 
-export async function uploadProductImage(productId: number, file: File) {
+export async function uploadProductImage(productId: number | string, file: File) {
 
   const form = new FormData();
   form.append("image", file);
