@@ -111,6 +111,7 @@ export default function EditProduct() {
         cost_price: form.cost_price ? Number(form.cost_price) : null,
         selling_price: Number(form.selling_price || 0),
         promo_price: form.promo_price ? Number(form.promo_price) : null,
+        status: form.status,
       });
 
       await client.post(`/admin/products/${id}/variants`, {
