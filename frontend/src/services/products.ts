@@ -3,6 +3,7 @@ import { client } from "../lib/client";
 export interface Product {
   id: number
   name: string
+  slug: string
   selling_price: number
   status: "draft" | "published"
   variants?: {
@@ -25,6 +26,10 @@ export interface Product {
   }[]
 }
 
+interface PaginatedProductsResponse {
+  data: Product[]
+}
+
 export interface CreateProductPayload {
   name: string
   part_number?: string
@@ -33,15 +38,18 @@ export interface CreateProductPayload {
 
 /* GET PRODUCTS */
 
-export function getProducts(search?: string): Promise<Product[]> {
-
+export async function getProducts(search?: string): Promise<Product[]> {
   const url = search
     ? `/admin/products?search=${encodeURIComponent(search)}`
     : `/admin/products`;
 
-  return client
-    .get<any>(url)
-    .then(res => res.data); 
+  const res = await client.get(url) as PaginatedProductsResponse | Product[];
+
+  if (Array.isArray(res)) {
+    return res;
+  }
+
+  return res.data ?? [];
 }
 
 /* UPDATE */
@@ -58,10 +66,8 @@ export function deleteProduct(id: number) {
 
 /* GET SINGLE PRODUCT */
 
-export function getProduct(id: number): Promise<Product> {
-  return client
-    .get<{ data: Product }>(`/admin/products/${id}`)
-    .then(res => res.data);
+export async function getProduct(idOrSlug: number | string): Promise<Product> {
+  return client.get(`/admin/products/${idOrSlug}/edit`);
 }
 
 /* CREATE */
