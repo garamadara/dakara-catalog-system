@@ -37,7 +37,7 @@ export function getProducts(search?: string): Promise<Product[]> {
 
 /* UPDATE */
 
-export function updateProduct(id: number, data: any) {
+export function updateProduct(id: number | string, data: any) {
   return client.put(`/admin/products/${id}`, data);
 }
 
@@ -49,9 +49,9 @@ export function deleteProduct(id: number) {
 
 /* GET SINGLE PRODUCT */
 
-export function getProduct(id: number): Promise<Product> {
+export function getProduct(id: number | string): Promise<any> {
   return client
-    .get<{ data: Product }>(`/admin/products/${id}`)
+    .get(`/admin/products/${id}/edit`)
     .then(res => res.data);
 }
 

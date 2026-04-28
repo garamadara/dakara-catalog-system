@@ -24,9 +24,9 @@ export default function EditProduct() {
   const [partNumber, setPartNumber] = useState("");
 
   useEffect(() => {
-    if (data) {
-      setName(data.name || "");
-      setPartNumber(data.part_number || "");
+    if (data?.product) {
+      setName(data.product.name || "");
+      setPartNumber(data.product.part_number || "");
     }
   }, [data]);
 

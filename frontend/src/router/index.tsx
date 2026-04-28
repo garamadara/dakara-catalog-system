@@ -28,7 +28,7 @@ export default function Router() {
 
           <Route path="/products" element={<Products />} />
           <Route path="/products/create" element={<CreateProduct />} />
-	  <Route path="/products/:id/edit" element={<EditProduct />} />
+	  <Route path="/products/:slug/edit" element={<EditProduct />} />
 
           <Route path="/categories" element={<Categories />} />
           <Route path="/categories/create" element={<CreateCategory />} />
