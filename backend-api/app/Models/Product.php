@@ -91,4 +91,15 @@ class Product extends Model
     {
         return Str::slug($name . '-' . $partNumber);
     }
+
+    public function resolveRouteBinding($value, $field = null)
+    {
+        if ($field !== null) {
+            return parent::resolveRouteBinding($value, $field);
+        }
+
+        return $this->where('id', $value)
+            ->orWhere('slug', $value)
+            ->firstOrFail();
+    }
 }

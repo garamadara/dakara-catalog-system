@@ -22,6 +22,12 @@ export interface CreateProductPayload {
   brand_id?: number | null
 }
 
+export interface EditProductResponse {
+  product: Product & {
+    part_number?: string | null
+  }
+}
+
 /* GET PRODUCTS */
 
 export function getProducts(search?: string): Promise<Product[]> {
@@ -31,13 +37,13 @@ export function getProducts(search?: string): Promise<Product[]> {
     : `/admin/products`;
 
   return client
-    .get<any>(url)
+    .get(url)
     .then(res => res.data); 
 }
 
 /* UPDATE */
 
-export function updateProduct(id: number, data: any) {
+export function updateProduct(id: number | string, data: any) {
   return client.put(`/admin/products/${id}`, data);
 }
 
@@ -49,9 +55,9 @@ export function deleteProduct(id: number) {
 
 /* GET SINGLE PRODUCT */
 
-export function getProduct(id: number): Promise<Product> {
+export function getProduct(id: number | string): Promise<EditProductResponse> {
   return client
-    .get<{ data: Product }>(`/admin/products/${id}`)
+    .get(`/admin/products/${id}/edit`)
     .then(res => res.data);
 }
 

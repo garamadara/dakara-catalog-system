@@ -86,7 +86,7 @@ export default function Products() {
         <div className="flex gap-4 text-sm">
 
           <button
-            onClick={() => navigate(`/products/${p.slug}/edit`)}
+            onClick={() => navigate(`/products/${p.id}/edit`)}
             className="text-blue-600 hover:text-blue-800 font-medium"
           >
             Edit
