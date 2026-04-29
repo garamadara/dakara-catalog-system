@@ -16,12 +16,15 @@ class Product extends Model
         'part_number',
         'normalized_part_number',
         'brand_id',
+        'description',
+        'public_description',
 
         'cost_price',
         'selling_price',
         'promo_price',
         'promo_start',
-        'promo_end'
+        'promo_end',
+        'status'
     ];
 
     protected static function boot()
@@ -85,6 +88,11 @@ class Product extends Model
     public function crossReferences()
     {
         return $this->hasMany(ProductCrossReference::class);
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
     }
 
     public static function generateSlug(string $name, string $partNumber): string

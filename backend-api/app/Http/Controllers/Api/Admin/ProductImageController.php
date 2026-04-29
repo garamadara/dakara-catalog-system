@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductImageController extends Controller
 {
+    public function show(ProductImage $image)
+    {
+        $path = $image->getRawOriginal('image_url');
+
+        abort_unless(Storage::disk('public')->exists($path), 404);
+
+        return response()->file(Storage::disk('public')->path($path));
+    }
+
     public function store(Request $request, Product $product)
     {
         $request->validate([
@@ -30,7 +39,7 @@ class ProductImageController extends Controller
     {
         $image = ProductImage::findOrFail($id);
 
-        Storage::disk('public')->delete($image->image_url);
+        Storage::disk('public')->delete($image->getRawOriginal('image_url'));
 
         $image->delete();
 

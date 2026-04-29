@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\ProductAttribute;
 use Illuminate\Http\Request;
 
 class ProductAttributeController extends Controller
 {
-    public function store(Request $request, $productId)
+    public function store(Request $request, Product $product)
     {
         $data = $request->validate([
             'attributes' => 'required|array',
@@ -26,7 +27,7 @@ class ProductAttributeController extends Controller
                 foreach ($value as $v) {
 
                     ProductAttribute::create([
-                        'product_id' => $productId,
+                        'product_id' => $product->id,
                         'attribute_id' => $attr['attribute_id'],
                         'value' => $v
                     ]);
@@ -36,7 +37,7 @@ class ProductAttributeController extends Controller
             } else {
 
                 ProductAttribute::create([
-                    'product_id' => $productId,
+                    'product_id' => $product->id,
                     'attribute_id' => $attr['attribute_id'],
                     'value' => $value
                 ]);
@@ -50,10 +51,10 @@ class ProductAttributeController extends Controller
         ]);
     }
 
-    public function index($productId)
+    public function index(Product $product)
     {
         return ProductAttribute::with('attribute')
-            ->where('product_id', $productId)
+            ->where('product_id', $product->id)
             ->get();
     }
 }

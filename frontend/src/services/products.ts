@@ -3,8 +3,18 @@ import { client } from "../lib/client";
 export interface Product {
   id: number
   name: string
+  slug: string
   selling_price: number
   status: "draft" | "published"
+  variants?: {
+    id: number
+    sku: string | null
+    part_number: string | null
+    cost_price: number | null
+    selling_price: number | null
+    promo_price: number | null
+    stock: number
+  }[]
 
   thumbnail?: {
     image_url: string
@@ -16,6 +26,10 @@ export interface Product {
   }[]
 }
 
+interface PaginatedProductsResponse {
+  data: Product[]
+}
+
 export interface CreateProductPayload {
   name: string
   part_number?: string
@@ -24,15 +38,18 @@ export interface CreateProductPayload {
 
 /* GET PRODUCTS */
 
-export function getProducts(search?: string): Promise<Product[]> {
-
+export async function getProducts(search?: string): Promise<Product[]> {
   const url = search
     ? `/admin/products?search=${encodeURIComponent(search)}`
     : `/admin/products`;
 
-  return client
-    .get<any>(url)
-    .then(res => res.data); 
+  const res = await client.get(url) as PaginatedProductsResponse | Product[];
+
+  if (Array.isArray(res)) {
+    return res;
+  }
+
+  return res.data ?? [];
 }
 
 /* UPDATE */
@@ -49,10 +66,8 @@ export function deleteProduct(id: number) {
 
 /* GET SINGLE PRODUCT */
 
-export function getProduct(id: number): Promise<Product> {
-  return client
-    .get<{ data: Product }>(`/admin/products/${id}`)
-    .then(res => res.data);
+export async function getProduct(idOrSlug: number | string): Promise<Product> {
+  return client.get(`/admin/products/${idOrSlug}/edit`);
 }
 
 /* CREATE */
@@ -62,16 +77,27 @@ export function createProduct(data: {
   category_id: number
   brand_id?: number | null
   part_number?: string | null
+  description?: string | null
+  public_description?: string | null
   cost_price?: number | null
   selling_price: number
   promo_price?: number | null
+  status?: "draft" | "published"
+  variants?: {
+    sku?: string | null
+    part_number?: string | null
+    cost_price?: number | null
+    selling_price?: number | null
+    promo_price?: number | null
+    stock?: number
+  }[]
 }) {
   return client.post("/admin/products", data);
 }
 
 /* UPLOAD PRODUCT IMAGE */
 
-export async function uploadProductImage(productId: number, file: File) {
+export async function uploadProductImage(productId: number | string, file: File) {
 
   const form = new FormData();
   form.append("image", file);
@@ -121,4 +147,17 @@ export function addCrossReferences(productId: number, references: any[]) {
     references
   });
 
+}
+
+/* ADD VARIANTS */
+
+export function addVariants(productId: number, variants: {
+  sku?: string | null
+  part_number?: string | null
+  cost_price?: number | null
+  selling_price?: number | null
+  promo_price?: number | null
+  stock?: number
+}[]) {
+  return client.post(`/admin/products/${productId}/variants`, { variants });
 }

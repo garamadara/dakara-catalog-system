@@ -9,7 +9,7 @@ class Brand extends Model
     protected $fillable = [
         'name',
         'slug',
-        'logo'
+        'logo_url'
     ];
 
     public function products()

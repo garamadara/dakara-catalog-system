@@ -38,6 +38,11 @@ export const client = {
       method: "PUT",
       body: JSON.stringify(body),
     }),
+  patch: (path: string, body: any) =>
+    request(path, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
   delete: (path: string) =>
     request(path, {
       method: "DELETE",

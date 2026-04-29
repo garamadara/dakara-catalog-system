@@ -38,4 +38,30 @@ class AttributeController extends Controller
 
         return response()->json($attribute);
     }
+
+    public function show(Attribute $attribute): JsonResponse
+    {
+        return response()->json($attribute);
+    }
+
+    public function update(Request $request, Attribute $attribute): JsonResponse
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255',
+            'type' => 'required|string',
+            'options' => 'nullable|array'
+        ]);
+
+        $attribute->update($data);
+
+        return response()->json($attribute);
+    }
+
+    public function destroy(Attribute $attribute): JsonResponse
+    {
+        $attribute->delete();
+
+        return response()->json(['success' => true]);
+    }
 }

@@ -2,17 +2,25 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProducts, deleteProduct } from "../services/products";
 import type { Product } from "../services/products";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import AdminTable from "../components/AdminTable";
+import Toast from "../components/ui/Toast";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 
 export default function Products() {
 
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
 
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
+  const [toast, setToast] = useState<{
+    type: "success" | "error" | "warning";
+    message: string;
+  } | null>((location.state as any)?.toast ?? null);
 
   const columns = [
     {
@@ -60,7 +68,7 @@ export default function Products() {
       header: "Price",
       accessor: (p: Product) => (
         <span className="text-sm font-medium text-gray-700">
-          $${Number(p.selling_price || 0).toFixed(2)}
+          ${Number(p.selling_price || 0).toFixed(2)}
         </span>
       ),
     },
@@ -130,12 +138,22 @@ export default function Products() {
         queryKey: ["products"],
         exact: false,
       });
+      setToast({
+        type: "success",
+        message: "Product deleted successfully.",
+      });
+      setPendingDeleteId(null);
+    },
+    onError: () => {
+      setToast({
+        type: "error",
+        message: "Failed to delete product.",
+      });
     },
   });
 
   function handleDelete(id: number) {
-    if (!confirm("Delete this product?")) return;
-    deleteMutation.mutate(id);
+    setPendingDeleteId(id);
   }
 
   if (isLoading) return <div className="p-6">Loading...</div>;
@@ -143,6 +161,27 @@ export default function Products() {
 
   return (
     <div className="p-6">
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        title="Delete product?"
+        description="This action cannot be undone. The product and related records will be removed."
+        confirmLabel="Delete Product"
+        onCancel={() => setPendingDeleteId(null)}
+        onConfirm={() => {
+          if (pendingDeleteId !== null) {
+            deleteMutation.mutate(pendingDeleteId);
+          }
+        }}
+        loading={deleteMutation.isPending}
+      />
 
       <PageHeader
         title="Products"

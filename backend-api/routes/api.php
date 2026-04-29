@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\Admin\ProductAliasController as AdminProductAliasCo
 use App\Http\Controllers\Api\Admin\CrossReferenceController as AdminCrossReferenceController;
 use App\Http\Controllers\Api\Admin\ProductAttributeController as AdminProductAttributeController;
 use App\Http\Controllers\Api\Admin\ProductCategoryController as AdminProductCategoryController;
+use App\Http\Controllers\Api\Admin\ProductVariantController as AdminProductVariantController;
 
 
 
@@ -86,6 +87,10 @@ Route::prefix('admin')->group(function () {
     */
     Route::get('/brands', [AdminBrandController::class, 'index']);
     Route::post('/brands', [AdminBrandController::class, 'store']);
+    Route::get('/brands/{brand}', [AdminBrandController::class, 'show']);
+    Route::put('/brands/{brand}', [AdminBrandController::class, 'update']);
+    Route::delete('/brands/{brand}', [AdminBrandController::class, 'destroy']);
+    Route::get('/brands/{brand}/logo', [AdminBrandController::class, 'logo']);
 
     /*
     |--------------------------------------------------------------------------
@@ -95,6 +100,10 @@ Route::prefix('admin')->group(function () {
 
     Route::get('/categories', [AdminCategoryController::class, 'index']);
     Route::post('/categories', [AdminCategoryController::class, 'store']);
+    Route::get('/categories/{category}', [AdminCategoryController::class, 'show']);
+    Route::put('/categories/{category}', [AdminCategoryController::class, 'update']);
+    Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy']);
+    Route::get('/categories/{category}/image', [AdminCategoryController::class, 'image']);
 
     Route::post('/products/{product}/categories', [AdminProductCategoryController::class, 'attach']);
     Route::delete('/products/{product}/categories/{category}', [AdminProductCategoryController::class, 'detach']);
@@ -107,6 +116,7 @@ Route::prefix('admin')->group(function () {
     */
 
     Route::post('/products/{product}/images', [AdminProductImageController::class, 'store']);
+    Route::get('/product-images/{image}/file', [AdminProductImageController::class, 'show']);
     Route::patch('/products/{product}/images/order', [AdminProductImageController::class, 'reorder']);
     Route::delete('/product-images/{id}', [AdminProductImageController::class, 'destroy']);
 
@@ -140,6 +150,9 @@ Route::prefix('admin')->group(function () {
 
     Route::get('/attributes', [AdminAttributeController::class, 'index']);
     Route::post('/attributes', [AdminAttributeController::class, 'store']);
+    Route::get('/attributes/{attribute}', [AdminAttributeController::class, 'show']);
+    Route::put('/attributes/{attribute}', [AdminAttributeController::class, 'update']);
+    Route::delete('/attributes/{attribute}', [AdminAttributeController::class, 'destroy']);
 
 
     /*
@@ -151,5 +164,13 @@ Route::prefix('admin')->group(function () {
     Route::post('/products/{product}/attributes', [AdminProductAttributeController::class, 'store']);
     Route::get('/products/{product}/attributes', [AdminProductAttributeController::class, 'index']);
     Route::delete('/product-attributes/{id}', [AdminProductAttributeController::class, 'destroy']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Product Variants
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/products/{product}/variants', [AdminProductVariantController::class, 'index']);
+    Route::post('/products/{product}/variants', [AdminProductVariantController::class, 'store']);
 
 });
